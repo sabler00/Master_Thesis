@@ -145,6 +145,6 @@ C = 10.768190250056133 - (-13.367138250056133)
 bottom_interface = 23.0
 top_interface = 40.0
  
-H2O = Trajectory('/home/praktikum/sal/Water_preequil/ffield/wat_dump.xyz', 10, bottom_interface, top_interface)
+H2O = Trajectory('wat_dump_CHOLi.xyz', 10, bottom_interface, top_interface)
 H2O.compute_radial_distribution()
 H2O.plot()
