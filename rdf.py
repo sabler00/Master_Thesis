@@ -3,15 +3,15 @@ import numpy as np
 from matplotlib import pyplot as plt
 
 
-def atom_vol(z, r, z_bot, z_top):
+def atom_vol(z, r, C):
     volume = 4.0 / 3.0 * sp.pi * r ** 3
 
-    if z + r > z_top:
-        h = z + r - z_top
+    if z + r > C:
+        h = z + r - C
         volume -= sp.pi * h ** 2 * (r - h / 3.0)
 
-    elif z - r < z_bot:
-        h = z - r + z_bot
+    elif z - r < C:
+        h = z - r + C
         volume -= sp.pi * h ** 2 * (r - h / 3.0)
 
     return volume
@@ -31,7 +31,7 @@ def distance(a, b):
 
 
 class Trajectory:
-    def __init__(self, filename, skip, z_bot_interface, z_top_interface, interface_offset=4.0, resolution=200):
+    def __init__(self, filename, skip, resolution=200):
         """ 
         self             : pointer to current object
         filename         : path to the trajectory file 
@@ -49,16 +49,13 @@ class Trajectory:
         with open(filename, 'r') as f:
             data = f.readlines()
 
-        self.z_top = z_top_interface - interface_offset
-        self.z_bot = z_bot_interface + interface_offset
-
         self.n_atoms = int(data[0])
         self.n_steps_total = int(len(data) / self.n_atoms)
 
         self.atom_list = [line.split()[0] for line in data[1: self.n_atoms + 1]]
 
         self.skip = skip
-        self.n_steps = self.n_steps_total / self.skip
+        self.n_steps = int(self.n_steps_total / self.skip)
 
         self.coordinates = np.zeros((self.n_steps, self.n_atoms, 3))
 
@@ -81,7 +78,7 @@ class Trajectory:
                 if self.atom_list[i] == "O":
                     n_h2o += 1
 
-        self.volume_per_h2o = A * B * (self.z_top - self.z_bot) * self.n_steps / n_h2o
+        self.volume_per_h2o = A * B * C * self.n_steps / n_h2o
 
     def compute_radial_distribution(self):
         """ no reason to go above half of the smallest lattice parameter as mirror images start 
@@ -100,7 +97,7 @@ class Trajectory:
             data_oxygen = []
             for i, atom in enumerate(self.coordinates[step]):
                 if self.atom_list[i] == "O":
-                    if self.z_bot < atom[2] < self.z_top:
+                    if C < atom[2]:
                         data_oxygen.append(atom)
             data_oxygen = sp.array(data_oxygen)
 
@@ -110,8 +107,8 @@ class Trajectory:
                 for j in range(self.resolution):
                     r1 = j * dr
                     r2 = r1 + dr
-                    v1 = volume(oxygen1[2], r1, self.z_bot, self.z_top)
-                    v2 = volume(oxygen1[2], r2, self.z_bot, self.z_top)
+                    v1 = atom_vol(oxygen1[2], r1, C)
+                    v2 = atom_vol(oxygen1[2], r2, C)
                     volumes[j] += v2 - v1
 
                 for oxygen2 in data_oxygen[i:]:
@@ -146,9 +143,6 @@ A = 32.382287464521355 - (-31.978589464547184)
 B = 8.428445250056132 - (-15.706883250056134)
 C = 10.768190250056133 - (-13.367138250056133)
 
-bottom_interface = 23.0
-top_interface = 40.0
-
-H2O = Trajectory('wat_dump_CHOLi.xyz', 10, bottom_interface, top_interface)
+H2O = Trajectory('wat_dump_CHOLi.xyz', 10)
 H2O.compute_radial_distribution()
 H2O.plot()
