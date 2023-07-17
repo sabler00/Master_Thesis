@@ -3,6 +3,19 @@ import numpy as np
 from matplotlib import pyplot as plt
 
 
+def distance(a, b):
+    dx = abs(a[0] - b[0])
+    x = min(dx, abs(A - dx))
+
+    dy = abs(a[1] - b[1])
+    y = min(dy, abs(B - dy))
+
+    dz = abs(a[2] - b[2])
+    z = min(dz, abs(C - dz))
+
+    return sp.sqrt(x ** 2 + y ** 2 + z ** 2)
+
+
 def atom_vol(z, r, C):
     volume = 4.0 / 3.0 * sp.pi * r ** 3
 
@@ -17,45 +30,18 @@ def atom_vol(z, r, C):
     return volume
 
 
-def distance(a, b):
-    dx = abs(a[0] - b[0])
-    x = min(dx, abs(A - dx))
-
-    dy = abs(a[1] - b[1])
-    y = min(dy, abs(B - dy))
-
-    dz = abs(a[2] - b[2])
-    z = min(dz, abs(C - dz))
-
-    return sp.sqrt(x ** 2 + y ** 2 + z ** 2)
-
-
 class Trajectory:
-    def __init__(self, filename, skip, resolution=200):
-        """ 
-        self             : pointer to current object
-        filename         : path to the trajectory file 
-        skip             : number of snapshots to be skipped between two configurations that are evaluated
-                           (for example, if trajectory is 9000 steps long, and skip = 10, every tenth step
-                           is evaluated, 900 steps in total; use skip = 1 to take every step of the MD)
-        z_bot_interface  : average vertical coordinate for interface below water layer in Angstrom
-        z_top_interface  : average vertical coordinate for interface above water layer in Angstrom
-        interface_offset : distance between interface and region of water with bulk-like properties
-        resolution       : number of points in the final radial distribution function """
-
-        self.rdf = 0
-        self.radii = 0
-        self.volume_per_h2o = 0
+    def __init__(self, filename, skip, resolution):
         with open(filename, 'r') as f:
             data = f.readlines()
 
-        self.n_atoms = int(data[0])
-        self.n_steps_total = int(len(data) / self.n_atoms)
+        self.n_atoms = int(data[0].split()[0])
+        self.n_steps_total = int(len(data) / self.n_atoms + 2)
 
-        self.atom_list = [line.split()[0] for line in data[1: self.n_atoms + 1]]
+        self.atom_list = [line.split()[0] for line in data[2: self.n_atoms + 2]]
 
         self.skip = skip
-        self.n_steps = int(self.n_steps_total / self.skip)
+        self.n_steps = int(self.n_steps_total // self.skip)
 
         self.coordinates = np.zeros((self.n_steps, self.n_atoms, 3))
 
@@ -81,8 +67,6 @@ class Trajectory:
         self.volume_per_h2o = A * B * C * self.n_steps / n_h2o
 
     def compute_radial_distribution(self):
-        """ no reason to go above half of the smallest lattice parameter as mirror images start 
-        to be double-counted """
         r_cutoff = min(A, B) / 2.0
         dr = r_cutoff / self.resolution
         volumes = np.zeros(self.resolution)
@@ -93,7 +77,6 @@ class Trajectory:
         for step in range(self.n_steps):
             print('{:4d} : {:4d}'.format(step, self.n_steps))
 
-            """ isolate all liquid water molecules based on the position of the oxygen atoms """
             data_oxygen = []
             for i, atom in enumerate(self.coordinates[step]):
                 if self.atom_list[i] == "O":
@@ -101,8 +84,6 @@ class Trajectory:
                         data_oxygen.append(atom)
             data_oxygen = sp.array(data_oxygen)
 
-            """ loop over each pair of H2O molecules, calculate their distance, build a histogram 
-            each pair is evaluated as two contributions to the distribution function """
             for i, oxygen1 in enumerate(data_oxygen):
                 for j in range(self.resolution):
                     r1 = j * dr
@@ -117,13 +98,10 @@ class Trajectory:
                     if 0 < index < self.resolution:
                         self.g_of_r[index] += 2.0
 
-        """ normalize by the volume of the spherical shell corresponding to each radius """
         for i, value in enumerate(self.g_of_r):
             self.g_of_r[i] = value * self.volume_per_h2o / volumes[i]
 
     def plot(self, filename=""):
-        """ plots the radial distribution function
-        if filename is specified, prints it to file as a pdf """
 
         if not self.g_of_r:
             print('compute the radial distribution function first\n')
@@ -143,6 +121,6 @@ A = 32.382287464521355 - (-31.978589464547184)
 B = 8.428445250056132 - (-15.706883250056134)
 C = 10.768190250056133 - (-13.367138250056133)
 
-H2O = Trajectory('wat_dump_CHOLi.xyz', 10)
+H2O = Trajectory('wat_dump_CHOLi.xyz', 10, 200)
 H2O.compute_radial_distribution()
 H2O.plot()
