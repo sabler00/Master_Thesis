@@ -103,7 +103,7 @@ class Trajectory:
 
     def plot(self, filename=""):
 
-        if not self.g_of_r.any():
+        if not self.g_of_r:
             print('compute the radial distribution function first\n')
             return
 
