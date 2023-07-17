@@ -82,7 +82,7 @@ class Trajectory:
                 if self.atom_list[i] == "O":
                     if C < atom[2]:
                         data_oxygen.append(atom)
-            data_oxygen = sp.array(data_oxygen)
+            data_oxygen = np.array(data_oxygen)
 
             for i, oxygen1 in enumerate(data_oxygen):
                 for j in range(self.resolution):
@@ -103,7 +103,7 @@ class Trajectory:
 
     def plot(self, filename=""):
 
-        if not self.g_of_r:
+        if not self.g_of_r.any():
             print('compute the radial distribution function first\n')
             return
 
@@ -121,6 +121,6 @@ A = 32.382287464521355 - (-31.978589464547184)
 B = 8.428445250056132 - (-15.706883250056134)
 C = 10.768190250056133 - (-13.367138250056133)
 
-H2O = Trajectory('wat_dump_CHOLi.xyz', 10, 200)
+H2O = Trajectory('wat_dump.xyz', 10, 200)
 H2O.compute_radial_distribution()
 H2O.plot()
