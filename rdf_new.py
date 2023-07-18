@@ -74,8 +74,6 @@ def main():
     # Write RDF to file
     write_rdf_file(rdf, bin_size, rdf_file)
 
-    print("RDF calculation completed.")
-
     def plot_data_from_file(file_path):
         x = []
         y = []
@@ -92,10 +90,10 @@ def main():
         plt.title('RDF Water')
         plt.show()
 
-    print("RDF calculation completed.")
-
     file_path = 'rdf.txt'  # Replace with your file path
     plot_data_from_file(file_path)
+
+    print("RDF calculation completed.")
 
 if __name__ == '__main__':
     main()
