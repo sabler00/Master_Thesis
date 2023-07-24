@@ -2,7 +2,6 @@ import math
 import matplotlib.pyplot as plt
 
 def calculate_distance(coord1, coord2):
-    """Calculates the distance between two coordinates."""
     x1, y1, z1 = coord1
     x2, y2, z2 = coord2
     dx = x2 - x1
@@ -16,14 +15,12 @@ def calculate_rdf(coordinates, bin_size, max_distance):
     num_bins = int(max_distance / bin_size)
     rdf = [0] * num_bins
 
-    # Find the oxygen atom indices
     oxygen_indices = []
     for i, atom in enumerate(coordinates):
         if atom[0] == 'O':
             oxygen_indices.append(i)
             num_oxygen += 1
 
-    # Calculate RDF for O-O pairs
     for i in range(num_oxygen):
         for j in range(i + 1, num_oxygen):
             atom1 = coordinates[oxygen_indices[i]][1:]
@@ -31,20 +28,18 @@ def calculate_rdf(coordinates, bin_size, max_distance):
             distance = calculate_distance(atom1, atom2)
             if distance < max_distance:
                 bin_index = int(distance / bin_size)
-                rdf[bin_index] += 2  # Count both directions
+                rdf[bin_index] += 2
 
-    # Normalize RDF
     normalization_factor = 4 * math.pi * num_oxygen / (3 * (num_oxygen - 1) * bin_size**3)
     rdf = [value / normalization_factor for value in rdf]
 
     return rdf
 
 def read_xyz_file(file_path):
-    """Reads an XYZ format file and returns a list of coordinates."""
     coordinates = []
     with open(file_path, 'r') as file:
         num_atoms = int(file.readline())
-        file.readline()  # Skip the comment line
+        file.readline()
         for _ in range(num_atoms):
             line = file.readline().split()
             atom = line[0]
@@ -53,25 +48,21 @@ def read_xyz_file(file_path):
     return coordinates
 
 def write_rdf_file(rdf, bin_size, file_path):
-    """Writes the RDF values to a file."""
     with open(file_path, 'w') as file:
         for i, value in enumerate(rdf):
             distance = (i + 0.5) * bin_size
             file.write(f'{distance:.3f} {value}\n')
 
 def main():
-    xyz_file = 'wat_dump.xyz'  # Replace with your input file
-    bin_size = 0.1  # Distance bin size
-    max_distance = 10.0  # Maximum distance to consider
-    rdf_file = 'rdf.txt'  # Output file for RDF
+    xyz_file = 'wat_dump.xyz'
+    bin_size = 0.1
+    max_distance = 10.0
+    rdf_file = 'rdf.txt'
 
-    # Read XYZ file
     coordinates = read_xyz_file(xyz_file)
 
-    # Calculate RDF for O-O pairs
     rdf = calculate_rdf(coordinates, bin_size, max_distance)
 
-    # Write RDF to file
     write_rdf_file(rdf, bin_size, rdf_file)
 
     def plot_data_from_file(file_path):
@@ -90,7 +81,7 @@ def main():
         plt.title('RDF Water')
         plt.show()
 
-    file_path = 'rdf.txt'  # Replace with your file path
+    file_path = 'rdf.txt' 
     plot_data_from_file(file_path)
 
     print("RDF calculation completed.")

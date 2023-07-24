@@ -1,0 +1,176 @@
+LAMMPS (23 Jun 2022 - Update 4)
+KOKKOS mode is enabled (src/KOKKOS/kokkos.cpp:106)
+  will use up to 1 GPU(s) per node
+WARNING: When using a single thread, the Kokkos Serial backend (i.e. Makefile.kokkos_mpi_only) gives better performance than the OpenMP backend (src/KOKKOS/kokkos.cpp:218)
+  using 1 OpenMP thread(s) per MPI task
+package kokkos
+package kokkos newton on neigh half comm no
+
+# REAX potential for high energy CHON systems
+# .....
+
+units           real
+
+atom_style      charge
+read_data       nptrepeat.data
+Reading data file ...
+  orthogonal box = (-0.8145646 -0.52817175 -504.74025) to (24.195867 21.129737 511.44825)
+  1 by 1 by 1 MPI processor grid
+  reading atoms ...
+  3200 atoms
+  reading velocities ...
+  3200 velocities
+  read_data CPU = 0.023 seconds
+
+pair_style      reaxff lmp_control
+WARNING: Ignoring inactive control parameter: simulation_name (src/REAXFF/reaxff_control.cpp:98)
+WARNING: Ignoring inactive control parameter: energy_update_freq (src/REAXFF/reaxff_control.cpp:98)
+WARNING: Support for writing native trajectories has been removed after LAMMPS version 8 April 2021 (src/REAXFF/reaxff_control.cpp:114)
+WARNING: Ignoring inactive control parameter: traj_title (src/REAXFF/reaxff_control.cpp:98)
+WARNING: Ignoring inactive control parameter: atom_info (src/REAXFF/reaxff_control.cpp:98)
+WARNING: Ignoring inactive control parameter: atom_forces (src/REAXFF/reaxff_control.cpp:98)
+WARNING: Ignoring inactive control parameter: atom_velocities (src/REAXFF/reaxff_control.cpp:98)
+WARNING: Ignoring inactive control parameter: bond_info (src/REAXFF/reaxff_control.cpp:98)
+WARNING: Ignoring inactive control parameter: angle_info (src/REAXFF/reaxff_control.cpp:98)
+pair_coeff      * * ffield.reax  C
+
+neigh_modify    every 10 delay 0 check no
+
+
+fix mynpt all npt temp 30 30 100 iso 1 1 1000
+fix             2 all qeq/reaxff 1 0.0 10.0 1e-6 reaxff
+
+dump            dumpxyz all xyz 25 graph_dump.xyz
+dump_modify     dumpxyz element C
+thermo 1000
+variable mytemp equal temp
+variable myvol equal vol
+variable myeng equal etotal
+fix myat1 all ave/time 10 10 100 v_mytemp file temperature.dat
+fix myat2 all ave/time 10 10 100 v_myvol file volume.dat
+fix myat3 all ave/time 10 10 100 v_myeng file energy.dat
+variable myenthalpy equal enthalpy
+fix myat4 all ave/time 10 10 100 v_myenthalpy file enthalpy.dat
+
+timestep 0.25
+run 40000
+
+CITE-CITE-CITE-CITE-CITE-CITE-CITE-CITE-CITE-CITE-CITE-CITE-CITE
+
+Your simulation uses code contributions which should be cited:
+
+- pair reaxff command:
+
+@Article{Aktulga12,
+ author = {H. M. Aktulga, J. C. Fogarty, S. A. Pandit, A. Y. Grama},
+ title = {Parallel reactive molecular dynamics: Numerical methods and algorithmic techniques},
+ journal = {Parallel Computing},
+ year =    2012,
+ volume =  38,
+ pages =   {245--259}
+}
+
+- fix qeq/reaxff command:
+
+@Article{Aktulga12,
+ author = {H. M. Aktulga, J. C. Fogarty, S. A. Pandit, A. Y. Grama},
+ title = {Parallel reactive molecular dynamics: Numerical methods and algorithmic techniques},
+ journal = {Parallel Computing},
+ year =    2012,
+ volume =  38,
+ pages =   {245--259}
+}
+
+CITE-CITE-CITE-CITE-CITE-CITE-CITE-CITE-CITE-CITE-CITE-CITE-CITE
+
+Neighbor list info ...
+  update every 10 steps, delay 0 steps, check no
+  max neighbors/atom: 2000, page size: 100000
+  master list distance cutoff = 12
+  ghost atom cutoff = 12
+  binsize = 12, bins = 3 2 85
+  2 neighbor lists, perpetual/occasional/extra = 2 0 0
+  (1) pair reaxff/kk, perpetual
+      attributes: half, newton off, ghost, kokkos_device
+      pair build: half/bin/newtoff/ghost/kk/device
+      stencil: full/ghost/bin/3d
+      bin: kk/device
+  (2) fix qeq/reaxff/kk, perpetual
+      attributes: full, newton off, kokkos_device
+      pair build: full/bin/kk/device
+      stencil: full/bin/3d
+      bin: kk/device
+Per MPI rank memory allocation (min/avg/max) = 69.52 | 69.52 | 69.52 Mbytes
+   Step          Temp          E_pair         E_mol          TotEng         Press          Volume    
+         0   27.750855     -645441.36      0             -645176.74     -308.47741      550442.51    
+      1000   29.308411     -645451.22      0             -645171.75      256.71552      550440.59    
+      2000   29.453659     -645429.48      0             -645148.62     -93.887767      550393.92    
+      3000   29.040966     -645406.17      0             -645129.25     -127.54079      550347.79    
+      4000   30.525599     -645421.62      0             -645130.54      301.02651      550365.64    
+      5000   31.628204     -645463.72      0             -645162.13     -326.76404      550516.75    
+      6000   29.579501     -645450.82      0             -645168.76      231.0403       550474.14    
+      7000   28.940199     -645421.59      0             -645145.63     -119.09895      550413.15    
+      8000   30.116647     -645445.03      0             -645157.85     -20.839094      550466.33    
+      9000   30.042782     -645451.12      0             -645164.64      371.61668      550521.26    
+     10000   31.699788     -645452.02      0             -645149.75     -715.80561      550468.05    
+     11000   29.772744     -645437.4       0             -645153.49      764.93113      550424.78    
+     12000   28.831827     -645409.61      0             -645134.68     -428.74705      550448.83    
+     13000   30.501041     -645407.32      0             -645116.48     -42.836755      550299.98    
+     14000   31.538652     -645444.99      0             -645144.25      366.09045      550418.31    
+     15000   30.469448     -645474.36      0             -645183.81     -443.78919      550616.5     
+     16000   28.585631     -645445.06      0             -645172.48      355.41728      550441.96    
+     17000   31.242289     -645436.71      0             -645138.8      -260.33317      550522.4     
+     18000   31.571838     -645450.21      0             -645149.15      149.05087      550505.46    
+     19000   29.290206     -645455.37      0             -645176.07      34.766747      550490.67    
+     20000   29.547314     -645446.72      0             -645164.97     -216.74076      550465.38    
+     21000   29.910876     -645423.33      0             -645138.11      310.23379      550457.19    
+     22000   30.267029     -645403.82      0             -645115.2      -238.21818      550329.02    
+     23000   31.197767     -645416.2       0             -645118.71      64.579779      550424.07    
+     24000   30.831629     -645444.69      0             -645150.69      132.71797      550421.82    
+     25000   30.595643     -645450.72      0             -645158.97     -272.15116      550573.79    
+     26000   30.583333     -645443.15      0             -645151.52      343.86967      550512.67    
+     27000   30.154169     -645447.71      0             -645160.17     -349.46804      550500.05    
+     28000   31.026645     -645468.08      0             -645172.22      219.07185      550603.47    
+     29000   29.901705     -645449.83      0             -645164.7       57.362377      550472.89    
+     30000   28.712649     -645414.25      0             -645140.45     -405.624        550419.12    
+     31000   29.319191     -645407.56      0             -645127.98      625.55719      550357.99    
+     32000   30.104945     -645414.61      0             -645127.54     -506.23945      550380.18    
+     33000   30.482098     -645444.96      0             -645154.29      55.548992      550478.33    
+     34000   30.041079     -645443.89      0             -645157.43      421.18657      550522.73    
+     35000   30.734671     -645430.98      0             -645137.9      -618.60574      550497.03    
+     36000   28.440943     -645414.92      0             -645143.72      572.4633       550343.18    
+     37000   30.12772      -645437.33      0             -645150.04     -405.49993      550604.4     
+     38000   31.004803     -645451.97      0             -645156.32      165.04513      550454.72    
+     39000   29.196303     -645421.98      0             -645143.58      18.71442       550474.3     
+     40000   30.188902     -645418.98      0             -645131.11     -173.29634      550457.89    
+Loop time of 1564.52 on 1 procs for 40000 steps with 3200 atoms
+
+Performance: 0.552 ns/day, 43.459 hours/ns, 25.567 timesteps/s
+57.7% CPU use with 1 MPI tasks x 1 OpenMP threads
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 1074.7     | 1074.7     | 1074.7     |   0.0 | 68.69
+Neigh   | 76.587     | 76.587     | 76.587     |   0.0 |  4.90
+Comm    | 9.8542     | 9.8542     | 9.8542     |   0.0 |  0.63
+Output  | 3.5332     | 3.5332     | 3.5332     |   0.0 |  0.23
+Modify  | 398.72     | 398.72     | 398.72     |   0.0 | 25.49
+Other   |            | 1.092      |            |       |  0.07
+
+Nlocal:           3200 ave        3200 max        3200 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Nghost:          10023 ave       10023 max       10023 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Neighs:    1.67318e+06 ave 1.67318e+06 max 1.67318e+06 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+FullNghs:   2.4641e+06 ave  2.4641e+06 max  2.4641e+06 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+
+Total # of neighbors = 2464096
+Ave neighs/atom = 770.03
+Neighbor list builds = 4000
+Dangerous builds not checked
+write_data sampling_end.data
+System init for write_data ...
+Total wall time: 0:26:05
