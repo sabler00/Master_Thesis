@@ -23,7 +23,7 @@ def calculate_ensemble_average(energy_values):
 
 
 if __name__ == "__main__":
-    dat_file_path = "ensemble_average_energy_ffield/ptcdi/energy.dat"
+    dat_file_path = "ensemble_average_energy_CHOLi/stack16l/energy.dat"
 
     energy_values = read_energy_from_dat_file(dat_file_path)
 
