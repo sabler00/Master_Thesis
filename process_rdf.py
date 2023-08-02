@@ -24,8 +24,9 @@ def read_and_parse_file(input_filename, output_filename):
     except Exception as e:
         print("An error occurred:", e)
 
-input_filename = 'tmp_CHOLi.dat'
-output_filename = 'processed_file.dat'
+input_snippet = input("specify thie method used in water simulation: ")
+input_filename = 'tmp_' + input_snippet + '.dat'
+output_filename = 'processed_file_' + input_snippet + '.dat'
 read_and_parse_file(input_filename, output_filename)
 
     
