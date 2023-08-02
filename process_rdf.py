@@ -1,24 +1,49 @@
 import matplotlib.pyplot as plt
 
+def read_and_parse_file(input_filename, output_filename):
+    try:
+        with open(input_filename, 'r') as input_file:
+            for _ in range(4):
+                next(input_file)
+            
+            data_columns = []
+            
+            for line in input_file:
+                columns = line.strip().split()
+                data_columns.append(columns[1:3])
+            
+            with open(output_filename, 'w') as output_file:
+                for columns in data_columns:
+                    output_line = ' '.join(columns) + '\n'
+                    output_file.write(output_line)
+            
+            print(f"Parsed data written to '{output_filename}'.")
+    
+    except FileNotFoundError:
+        print(f"Input file '{input_filename}' not found.")
+    except Exception as e:
+        print("An error occurred:", e)
+
+input_filename = 'tmp_CHOLi.dat'
+output_filename = 'processed_file.dat'
+read_and_parse_file(input_filename, output_filename)
+
+    
 def plot_data_from_file(file_path):
-    datrow = []
-    rdfcol2 = []
+        x = []
+        y = []
 
-    with open(file_path, 'r') as file:
-        lines_after_4 = file.readlines()[4:]
-        for lines_after_4 in file:
-            columns = lines_after_4.strip().split()
-            rowval = float(columns[1])
-            col2val = float(columns[2])
-            datrow.append(rowval)
-            rdfcol2.append(col2val)
+        with open(file_path, 'r') as file:
+            for line in file:
+                data = line.split()
+                x.append(float(data[0]))
+                y.append(float(data[1]))
 
+        plt.plot(x, y)
+        plt.xlabel('r (Å)')
+        plt.ylabel('g$_{O-O}$(r)')
+        plt.title('RDF Water')
+        plt.show()
 
-    plt.plot(datrow, rdfcol2)
-    plt.xlabel('r / Å')
-    plt.ylabel('g(r) / -')
-    plt.title('RDF Water with one Na atom')
-    plt.show()
-
-file_path = 'tmp_ffield_with_na.dat'
+file_path = output_filename
 plot_data_from_file(file_path)
