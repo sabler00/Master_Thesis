@@ -24,9 +24,8 @@ def read_and_parse_file(input_filename, output_filename):
     except Exception as e:
         print("An error occurred:", e)
 
-input_snippet = input("specify thie method used in water simulation: ")
-input_filename = 'tmp_' + input_snippet + '.dat'
-output_filename = 'processed_file_' + input_snippet + '.dat'
+input_filename = 'Na-O.dat'
+output_filename = 'processed_file_' + input_filename + '.dat'
 read_and_parse_file(input_filename, output_filename)
 
     
@@ -41,9 +40,9 @@ def plot_data_from_file(file_path):
                 y.append(float(data[1]))
 
         plt.plot(x, y)
-        plt.xlabel('r (Å)')
-        plt.ylabel('g$_{O-O}$(r)')
-        plt.title('RDF Water')
+        plt.xlabel('r / Å')
+        plt.ylabel('g$_{Na-O}$(r) / - ')
+        plt.title('Sodium Solvation Shells')
         plt.show()
 
 file_path = output_filename
