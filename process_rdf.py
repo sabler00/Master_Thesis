@@ -24,7 +24,7 @@ def read_and_parse_file(input_filename, output_filename):
     except Exception as e:
         print("An error occurred:", e)
 
-input_filename = 'O-O_rdf.dat'
+input_filename = 'O-O_rdf_Water2017_ffield.dat'
 output_filename = 'processed_file_' + input_filename
 read_and_parse_file(input_filename, output_filename)
 
