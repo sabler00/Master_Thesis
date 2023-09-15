@@ -23,9 +23,8 @@ def calculate_ensemble_average(energy_values):
 
 
 if __name__ == "__main__":
-    ffield = input("enter forcefield abbreviation: ")
-    sys = input("enter system name: ")
-    dat_file_path = "ensemble_average_energy_" + ffield + "/" + sys + "/energy.dat"
+    fold = input("system: ")
+    dat_file_path = "npt_stack_energy_300K/ffield/" + fold + "/energy.dat"
 
     energy_values = read_energy_from_dat_file(dat_file_path)
 
