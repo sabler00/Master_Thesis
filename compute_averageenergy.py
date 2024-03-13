@@ -23,11 +23,11 @@ def calculate_ensemble_average(energy_values):
 
 
 if __name__ == "__main__":
-    dat_file_path = "energy_8stack_CHOLi.dat"
+    dat_file_path = "shake_bonds/outer_4.dat"
 
     energy_values = read_energy_from_dat_file(dat_file_path)
 
     ensemble_average_energy = calculate_ensemble_average(energy_values)
 
     if ensemble_average_energy is not None:
-        print(f"Ensemble Average Energy: {ensemble_average_energy:.4f}")
+        print(f"Average bond distance: {ensemble_average_energy:.16f}")
