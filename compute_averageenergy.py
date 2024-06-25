@@ -1,3 +1,5 @@
+import sys
+
 def read_energy_from_dat_file(file_path):
     energy_values = []
     with open(file_path, 'r') as file:
@@ -21,13 +23,20 @@ def calculate_ensemble_average(energy_values):
     ensemble_average = total_energy / len(energy_values)
     return ensemble_average
 
+def main():
+    if len(sys.argv) != 2:
+        print("Usage: python script.py <filename>")
+        sys.exit(1)
 
-if __name__ == "__main__":
-    dat_file_path = "shake_bonds/outer_4.dat"
+    filename = sys.argv[1]
 
-    energy_values = read_energy_from_dat_file(dat_file_path)
+    energy_values = read_energy_from_dat_file(filename)
 
     ensemble_average_energy = calculate_ensemble_average(energy_values)
 
     if ensemble_average_energy is not None:
-        print(f"Average bond distance: {ensemble_average_energy:.16f}")
+        print(f"Average Energy (kcal/mol): {ensemble_average_energy:.16f}")
+
+
+if __name__ == "__main__":
+    main()
