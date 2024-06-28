@@ -3,55 +3,34 @@ import os
 import pandas as pd
 from statistics import mean
 
-def extract_and_average_last_column(lines, atom_indices):
-    averages = []
-    step_size = 1480
-    header_lines = 3
-    num_steps = len(lines) // (step_size + header_lines)
-
-    for step in range(num_steps):
-        start = step * (step_size + header_lines)
-        end = start + step_size + header_lines
-        step_lines = lines[start:end]
-        
-        step_values = []
-        for index in atom_indices:
-            line_index = index + header_lines
-
-            columns = step_lines[line_index].split()[1:]
-            if len(columns) == 3: 
-                    last_column_value = float(columns[-1])
-                    step_values.append(last_column_value)
-                
-        average_value = sum(step_values) / len(step_values)
-        averages.append(average_value)
-
-
-    return averages
-
-
-""" for step in range(num_steps):
-    step_frame = df[:,step*] """
-
-
 file_path = '/home/sal/qmcf_examples/graphite_qmmm_setup/graphite-md-02.xyz'
 
 
 df = pd.read_csv(file_path, delim_whitespace=True, header = None, skiprows= 1)
 
-df = df.drop(df[df.iloc[:, 0] == 'X'].index)
-df = df.drop(df[df.iloc[:, 0] == '1481'].index)
-#df = df.drop(to_drop)
-#print(df[df.iloc[:,0] == 1481])
-#print(df[df.iloc[:, 0] == '1481'])
-
+df = df.drop(df[df.iloc[:, 0] == 'X'].index) #drops dummy atom
+df = df.drop(df[df.iloc[:, 0] == '1481'].index) #drops atom count line at every new step
 
 df = df.reset_index(drop = True)
-#df = df.drop()
 print(df)
 
+def process_step(step): 
+    step_surface = step.iloc[1152:1439, 3] #defining subchunk for surface and substrate, 3 for z axis
+    step_substrate = step.iloc[1440:1479, 3]
+    return step_surface.mean(), step_substrate.mean() 
 
-""" atom_indices = range(1153, 1481)
-averages = extract_and_average_last_column(lines, atom_indices)
-print(averages)
- """
+step_size = 1480 # needs to be adjusted for atom count 
+
+results = []
+
+for step in range(0, len(df), step_size):
+    end = step + step_size 
+    frame = df.iloc[step:end]
+    result = process_step(frame)
+    results.append(result)
+
+results_simulation = pd.DataFrame(results)
+print(results_simulation)
+
+overall_average = results_simulation.mean()
+print(overall_average)
