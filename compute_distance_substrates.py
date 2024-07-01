@@ -4,7 +4,7 @@ import pandas as pd
 file_path = '/home/sal/qmcf_examples/graphite_qmmm_setup/graphite-md-02.xyz'
 
 
-df = pd.read_csv(file_path, delim_whitespace=True, header = None, skiprows= 1)
+df = pd.read_csv(file_path, sep='\s+', header = None, skiprows= 1)
 
 df = df.drop(df[df.iloc[:, 0] == 'X'].index) #drops dummy atom
 df = df.drop(df[df.iloc[:, 0] == '1481'].index) #drops atom count line at every new step
@@ -32,7 +32,7 @@ for step in range(0, len(df), step_size):
     results.append(result)
 
 results_simulation = pd.DataFrame(results)
-print(results_simulation)
+#print(results_simulation)
 
 overall_average = results_simulation.mean()
 print(overall_average)
